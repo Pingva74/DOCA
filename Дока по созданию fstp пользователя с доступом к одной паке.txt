@@ -1,0 +1,31 @@
+sftp
+
+Создаем пользователя с доступом только по sftp (без ssh и ftp) с доступом только в 1 каталог:
+
+1. adduser vipiki 
+2. ставим пароль для пользователя 
+      # passwd vipiki
+4. меняем в /etc/passwd  uid gid на bitrix 
+5. прописываем в /etc/passwd в качестве shell /sbin/nologin
+6. ставим владельца домашнего каталога root.root 
+      # chown root.root /home/vipiki 
+      # chmod 755 /home/vipiki
+7. Создаем точку монтирования
+    # mkdir /home/vipiki/test.vipiki.ru
+8. mount -o bind /home/bitrix/ext_www/vipiki /home/vipiki/test.vipiki.ru/
+9. вносим в fstab чтобы при перезагрузке монтировался каталог 
+      /home/bitrix/ext_www/vipiki     /home/vipiki/test.vipiki.ru   none    bind    0    0
+10. /etc/ssh/sshd_config
+Match User vipiki
+        X11Forwarding no
+        AllowTcpForwarding no
+        ForceCommand internal-sftp
+        ChrootDirectory /home/vipiki
+        AllowAgentForwarding no
+
+Проверяем что в /etc/ssh/sshd_config
+      Subsystem       sftp    internal-sftp -m 664
+
+11. Перезапускаем ssh
+# service sshd restart
+

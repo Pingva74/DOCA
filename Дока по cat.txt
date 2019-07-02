@@ -1,0 +1,15 @@
+Команда cat/
+
+cat /etc/passwd - просмотр содежимого файла /etc/passwd.
+cat /etc/passwd /etc/shadow просмотр содержимого двух файлов /etc/passwd и /etc/shadow.
+cat -n /etc/passwd - просмотр содежимого файла /etc/passwd с выводом порядкового номара строк.
+cat /etc/passwd | more - просмотр содежимого файла /etc/passwd - Вывод файла осуществляется частяси, которые видны в консоли.
+cat -e /etc/passwd - просмотр содежимого файла /etc/passwd с выводом знака $ в конце каждой строки.
+cat /dev/null > /var/log/nginx/access.log - быстрое удаление содержимого файла.
+cat file file.1 file.2 > file.common - объединение 3 файлов в один общий.
+cat file file.1 file.2 | sort > file.common - объединение 3 файлов в один общий и сортировка строк по алфавиту.
+cat >new.file создание нового файла new.file.
+cat file.old > file.new - копирование файла file.old в file.new.
+cat -s file - вывод содержимого файла с подавлением повторяющихся пустых строк.
+tac /etc/passwd - просмотр содежимого файла /etc/passwd в обратном порядке.
+

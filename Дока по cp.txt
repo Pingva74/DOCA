@@ -1,0 +1,10 @@
+Команда cp
+cp /etc/fstab /var/backup/fstab - копируем файл /etc/fstab в каталог /var/backup/
+cp passwd shadow hosts /var backup - копируем файлы passwd shadow hosts в папку /var/backup/ (при условии что текущий каталог /etc).
+cp -v robots.txt /tmp/robots.txt - копируем файл robots.txt в /tmp/robots.txt и выводит статистику в виде 'robots.txt' -> '/tmp/robots.txt'
+cp -p robots.txt /tmp/robots.txt - копируем файл robots.txt в /tmp/robots.txt и сохраняет все его аттрибуты (время создания\модификации, владельца и ACL)
+cp -R * /var/backup - копирует все содержимое текущего католога включая подкаталоги в каталог /var/backup, за исключением спрятанных файлов.
+cp -i robots.txt /tmp/robots.txt - копируем файл robots.txt в /tmp/robots.txt и перед копированием файла спрашиваем у пользователя подтверждение.
+cp -b robots.txt /tmp/robots.txt - создает резервную копию файла в указанной папке.
+
+
