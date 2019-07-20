@@ -1,0 +1,18 @@
+find ./ -name "index.php" поиск файла в теущей папке
+find /etc/httpd /etc/nginx -type f -name "*.conf" поиск по шаблону в двух папках
+find ./ -name ".*" поиск скрытых файлов в теущей папке
+find ./ type f -perm 0664 найти все файлы с правами доступа 664
+find ./ type f -perm /a=x найти все исполняемые файлы
+find / -user sergiy найти все файла пользователя sergiy
+find / -group dev найти все файла группы dev
+find / -mtime 10 найти все файлы модифицированные 10 дней назад
+find / -atime 10 найти все файлы открытые 10 дней назад
+find / -cmin 60 найти все файлы модифицированные в течении 60-ти минут
+find / -size +50M -size -100M найти все файлы размером от 50 до 100М
+find / -type f -exec ls -s {} \; | sort -n -r | head -5 найти 5 самых маленьких файлов
+find / -type f -exec ls -s {} \; | sort -n | head -5
+find / -type f -empty найти все пустые файлы
+find /var/log -type f -name *.log -size +10M -exec rm -f {} \; удалить все логи больше 10М
+find /var/log -type f -printf '%TY-%Tm-%Td %TT %p\n' | sort -r Список файлов отсортированных по дате модификации
+find /var/log -mtime +180 -type f -exec scp -P 3322 {} root@192.168.1.1:/backup/ \; скопировать все файлы старше полугода на другой сервер (должен быть прописан ключ)
+find ./ -type f -exec chmod 655 {} \; Меняем права всех файлов в текущем каталоге.
