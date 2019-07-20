@@ -1,0 +1,12 @@
+Добавление проверок для elastic search в zabbix
+
+1 скачать скрипт со ссылки https://github.com/mkhpalm/elastizabbix/blob/master/agent/elastizabbix
+2 Делаем его исполняемым, помещаем в папку /etc/zabbix/scripts
+3 Создаем файл /etc/zabbix/zabbix_agentd.d/userparameter_elasticZabbix.conf с таким содержимым:
+"UserParameter=elastizabbix[*],/etc/zabbix/scripts/elastizabbix $1 $2"
+
+4 Скачиваем шаблон проверки от сюда: https://github.com/mkhpalm/elastizabbix/blob/master/template/templates_app_elasticsearch.xml
+5 Экспортируем его в zabbix.
+
+6 Перезапускаем заббикс-агент.
+7 В зависимости от конфигурации elastic search, возможно нужно будет отключить некоторые айтемы, так как по умолчанию включены items отслеживающие параметры кластера и шардов.

@@ -1,0 +1,98 @@
+Перенос сайтов в виртуальную панель Битрикс
+
+Запускаем панель  управления, в нашем случае 
+/root/menu.sh
+
+После старта увидим перед собой следующее меню:
+
+Available actions:
+       1. Manage Hosts in the pool
+       2. Manage localhost
+       3. Configure MySQL servers
+       4. Configure memcahed servers
+       5. Background tasks in the pool
+       6. Manage sites in the pool
+       7. Manage sphinx in the pool
+       8. Manage web nodes in the pool
+       9. Monitoring in pool
+       10. Configure Push/RTC service
+       0. Exit
+
+Для создания сайта нам нужен пункт меню 6:
+6. Manage sites in the pool
+
+далее отвечаем на вопросы которые задает панель:
+
+1. Create site => выбираем 1 жмем Enter
+
+Create new site
+0. Go to previous screen or exit
+
+Enter the site name (e.g. example.org) or 0 to exit: (тут вводим имя нашего сайта)
+
+Далее указываем тип сайта. В случае переноса рабочего сайта определяем тип как kernel
+
+Выбираем кодировку UTF-8, 
+
+Далее выбираем нужен нам cron или нет.
+
+Потом панель предложит нам создать базу данных и пользователя.
+Это можно сделать в автоматическом режиме. Но лучше найти файл dbconn.php на сайте который
+мы переносим, и все данные (Имя-бд, имя пользователя и пароль) скопировать из него и создать 
+базу в ручную с нужными параметрами.
+
+Далее создаем дамп базы:
+mysqldump --opt journalshop_db > /root/journalshop_db.sql
+Переносим его на наш сервер
+scp journalshop_db.sql root@*.*.*.*:/root/
+и запускаем заливку дампа в базу нового сайта:
+mysql -u user -p journalshop_db < /root/journalshop_db.sql
+
+Далее копируем файлы сайта на новое место:
+rsync -az /старый ДокРут/  --delete --exclude="bitrix/cache" --exclude='bitrix/managed_cache' --exclude='bitrix/backup' --exclude='.htaccess' --exclude='bitrix/.settings.php' --exclude='bitrix/php_interface/dbconn.php' root@*.*.*.*:/новый ДокРут/
+
+После окончания заливки дампа базы и переноса всех файлов сайт должен заработать автоматически.
+
+Далее надо проверить все ли корректно работает.
+1 записываем в докрут файл доступа
+2 с его помощью заходим в админку
+3 далее Настройки- Инструменты- Проверка системы- Начать тестирование
+
+Моугт возникнуть проблемы с БД например:"Ошибка! Структура базы данных имеет ошибки (...)
+Всего 22. Автоматически могут быть исправлены 22. <Исправить>" - Жмем исправить и не покидаем
+страницу до окончания процедуры.
+
+Могут возникнуть ошибки с отправкой почты. Эти ошибки попадают в лог httpd. 
+Ошибку "msmtp: account имя.сайта not found in /etc/msmtprc and /home/bitrix/.msmtprc"
+можно исправить следующим способом:
+
+Запускаем панель  управления, /root/menu.sh
+
+Выбираем пункт 6
+6. Manage sites in the pool
+
+Далее пункт 4
+4. Change email settings on site
+
+Вводим имя сайта
+Enter site name (default) or 0 to exit: exampl.com
+
+соглашаемся изменить почтовые настройки
+Do you want to update email settings for exampl.com (N|y): y
+
+Вводим почтовый ящик от которого будет отправляться почта
+Enter From email address (ex. bob@example.org):post@mail.ru
+
+Если отправляется почта с текущего сервера оставляем поле пустым
+Enter server address or DNS (127.0.0.1):
+
+Стандартный порт для отправки почты, если не указан другой, оставляем пустым
+Enter server port (25):
+
+Если аутентификация не нужна выбираем n
+Do you want to use SMTP authentication on 127.0.0.1:25? (N|y) n
+
+Тут же можно включить TLS если необходимо:
+Do you need TLS enabled for 127.0.0.1:25? (N|y) n
+
+На этом все. Проводим тестирование системы еще раз, что бы убедиться, что все ок.

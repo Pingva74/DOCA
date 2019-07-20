@@ -1,0 +1,66 @@
+DKIM + EXIM4
+
+Создаем директоррию для приватного ключа
+
+mkdir /etc/exim4/dkim && cd /etc/exim4/dkim
+
+Устанавливаем opendkim-tools
+
+apt-get install opendkim-tools
+
+Генерируем пару ключей;
+
+opendkim-genkey -D /etc/exim4/dkim/ -d h1.webcompass-dc-r.hce-project.com -s mail --bits=1024
+
+Меняем владельца:
+
+chown -R Debian-exim:Debian-exim /etc/exim4/dkim
+
+Открываем для редактирования файл /etc/exim4/exim4.conf.template
+(или /etc/exim4/conf.d/transport/30_exim4-config_remote_smtp, если конфиг разбит на части.)
+
+и перед секцией remote_smtp добавлям строчки:
+
+# DKIM:
+DKIM_DOMAIN = ${lc:${domain:$h_from:}}
+DKIM_KEY_FILE = /etc/exim4/dkim/DKIM_DOMAIN.key
+DKIM_PRIVATE_KEY = ${if exists{DKIM_KEY_FILE}{DKIM_KEY_FILE}{0}}
+DKIM_SELECTOR = mail
+
+Сохраняем, перезапускаем exim
+
+service exim4 restart
+
+Проверяем результат:
+
+exim -bP transports | grep dkim
+
+Если все ок, результат будет примерно такой:
+
+dkim_domain = ${lc:${domain:$h_from:}}
+dkim_private_key = ${if exists{/etc/exim4/dkim/${lc:${domain:$h_from:}}.key}{/etc/exim4/dkim/${lc:${domain:$h_from:}}.key}{0}}
+
+Создаем ТХТ запись в ДНС. В поле имя добавляем запись "mail._domainkey", в поле самой записи добавляем то что указанно у нас в публичном ключе:
+
+v=DKIM1; h=sha256; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcbu6mvGWmF65Suqazr3Krb2Ky/EXs8qaT1yMDfc00YJD77dq6jCnAwxQUHHuKanlELGd1uqoVpKzmmVoquUChbmTzs5MBuzw0TCEhzIyyiD+ZZBbJQa85a7OhdLoDs7MkwlF2Asqj4k44CpJo0c7gAySdbIQNaY9YpTW0L1TatwIDAQAB
+
+Публичный ключ лежит тут: /etc/exim4/dkim/*.public
+
+Проверяем работу записи :
+
+dig txt mail._domainkey.h1.webcompass-dc-r.hce-project.com
+
+ответ должен быть такой:
+
+;; ANSWER SECTION:
+mail._domainkey.h1.webcompass-dc-r.hce-project.com. 2953 IN TXT    "v=DKIM1; h=sha256; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHaYNxlasM0XBO9b1UeciGQTHf4xNpYqN1dFSipvD4ejMlPmYWNvv1/eTHJgVtLNwnYI0v2qQxjblInfZRpwgtlgwGhF7k+J7aYd8y7DyCIu+USmiSPehJ52yWLPS6OmlY3sn5k76LCWj2IUbhYNORHJ/HXLyAAnt8aQBxqoJZzQIDAQAB" 
+
+Отправляем себе тестовое письмо, и смотрим его заголовки. Должны увидеть примерно следующее:
+
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@h1.webcompass-dc-r.hce-project.com header.s=mail header.b=r7h53YDB;
+       spf=pass (google.com: domain of root@h1.webcompass-dc-r.hce-project.com designates 95.216.37.43 as permitted sender) smtp.mailfrom=root@h1.webcompass-dc-r.hce-project.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=h1.webcompass-dc-r.hce-project.com; s=mail; h=Date:From:Message-Id:To: Subject:Sender:Reply-To:Cc:MIME-Version:Content-Type: Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date: Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To: References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post: List-Owner:List-Archive; bh=8mWDwH82uJL4vBeOo5AF5XRKQ3kKB0Ygzwsgtep/PAQ=; b=r 7h53YDBqxU5lgztKbVaoxrH3b4Y2bspXlIRs7MPlaN1qB3H5BhVhLNfWqpGZX42fI2qIsPdjZlMcW lTDpTdWllbJq5ip5XkKa1EHyLLGxotr/LtJ9j8hR3BFw2piUCW/PwmafGAjOl+BeszeO2j/EPC2ev ox47GQE66Kw5H7CA=;
+Received: from root by h1.webcompass-dc-r.hce-project.com with local (Exim 4.89) (envelope-from <root@h1.webcompass-dc-r.hce-project.com>) id 1gwMQC-0001sU-FQ for alex@gmail.com; Wed, 20 Feb 2019 09:36:00 +0200
+
+Это все.

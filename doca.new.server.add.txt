@@ -1,0 +1,81 @@
+Добавление нового сервера
+
+Добавить сервер в:
+
+    tp.suppix.org - доступ на сервер и остальные аккаунты по клиенту
+    zabbix.suppix.org - мониторинг:
+        Проверяем raid если есть (документация по RAID)
+        Smartmontools (smartd) проверяем диски на такие параметры
+            для SATA - Reallocated_Sector_Ct, Offline_Uncorrectable, Current_Pending_Sector (если есть)
+            для SSD - Unused_Rsvd_Blk_Cnt_Tot, Wear_Leveling_Count (Available_Reservd_Space, Media_Wearout_Indicator)
+            в конфигурационный файл smartd.conf добавить диски
+
+            /dev/sda -a -o on -S on -s (S/../.././02|L/../../6/03) -m server@suppix.org
+            /dev/sdb -a -o on -S on -s (S/../.././02|L/../../6/03) -m server@suppix.org
+
+        Смотрим на сервере какие процессы запущены (ps aux) и добавляем в мониторинг, если нет для процесса шаблона, создаем шаблон с таким же названием как и сам процесс
+        Если на сервере есть сайты, то пару сайтов поставить на мониторинг и добавить триггер
+
+    настроить бэкап (rsnapshot) сервера на сервер бэкапов
+    установить почтовый клиент (postfix), проверить отправку тестового письма (echo "email message" | mail -s Test Мой_ящик@suppix.org)
+    установить logcheck, добавить файлик suppix c сервера backup.suppix.org
+    выставить время правильно и time zone
+    redmine wiki - записать сервер в список серверов для клиента, выписать важную информацию про сервер и клиента
+    backup.suppix.org:/etc/hosts - добавить ip и имя
+    добавить наш ключ в root или в другого юзера под которым будет заходить на сервер
+
+    php
+
+short_open_tag On
+
+Выставить нужную зону:
+
+date.timezone 
+
+    mysql
+
+sql_mode = 
+
+
+=================================================================================================
+Logcheck
+
+Установка
+
+apt-get install logcheck
+
+Настройка logcheck
+Сделаем бекап конфига
+
+cp /etc/logcheck/logcheck.conf /etc/logcheck/logcheck.conf.default
+
+Можно выберать один из готовых режимов работы
+Могут быть установлены "workstation", "server" или "paranoid" (из коробки стоит режим server)
+Редактируем файл конфигурации:
+
+vim /etc/logcheck/logcheck.conf
+
+Установим server профайл
+REPORTLEVEL="server"
+
+Установим куда слать отчеты
+SENDMAILTO=server@suppix.org
+
+Укажем логфайлы которые необходимо парсить в файле logcheck.logfiles
+
+vim /etc/logcheck/logcheck.logfiles
+
+Период отправки отчета
+Укажем в кроне как часто слать письма на почту (каждый час)
+
+vim /etc/cron.d/logcheck
+
+00 * * * *       logcheck    if [ -x /usr/sbin/logcheck ]; then nice -n10 /usr/sbin/logcheck; fi
+
+Запуск из консоли
+
+sudo -u logcheck logcheck
+
+Первоисточник
+
+

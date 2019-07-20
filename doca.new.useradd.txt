@@ -1,0 +1,38 @@
+Для заведения нового пользователя в dew.p-w-d.ru / stage.obispace.ru 
+
+1 подключаемся :
+для stage.obispace.ru sudo ssh -p 60022 root@stage.obispace.ru (тут порт 60022)
+для dev.p-w-d.ru sudo ssh root@dev.p-w-d.ru
+2 создаем пользователя :
+
+для stage.obispace.ru: useradd -p PASSWORD -s /bin/bash USER
+
+для dew.p-w-d.ru все делаем через Весту: bash /usr/local/vesta/bin/v-add-user USER PASSWORD info@dev.p-w-d.ru default USER USER
+
+* имя пользователя Иван Петров, создаем ipetrov (1 буква имени и фамилия)
+3 добавляем ключи
+4 изменяем права на домашнюю папку (для stage.obispace.ru)
+5 Добавляем доступы (только для stage.obispace.ru):
+setfacl -R -m u:USER:7 /var/www/obispace.ru/htdocs
+setfacl -d -R -m u:USER:7 /var/www/obispace.ru/htdocs
+
+Заходим на gitlab.p-w-d.ru
+1 заходим Admin area -> New user и тут заполняем 3 поля:
+Name ipetrov тот же пользователь что и на stage.obispace.ru кирилица не допустима.
+Username ipetrov тот же пользователь что и на stage.obispace.ru кирилица не допустима.
+Email email@mail.ru реальный Email, дается в таске.
+и сохраняем.
+
+2 на следующей странице  нажимаем кнопку edit
+Добавляем пользователю пароль. (сложный, хотя бы 8 символов)
+сохраняем.
+
+3 Заходим в папку с проектами и добавляем нашего пользователя в нужный проект, 
+с нужными правами, обычно Developer.
+
+на этом все.
+
+
+
+
+

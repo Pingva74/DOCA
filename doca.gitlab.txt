@@ -1,0 +1,11 @@
+Дока по добавлению сайта в GitLab
+
+Открываем ссылку http://gitlab.p-w-d.ru L(Login root\ passwd YfsmKGcL1fqrgoKWjrjj)
+
+Далее жмем [New project], меняем Administrator на website.
+
+Создаем проект. Переходим в ДокРут сайта в консоли, и ваполняем второй блок команд из 
+подсказок GitLab
+Далее переходим /settings/repository/Protected Branches и снимаем защиту с Protected Branches
+
+На этом все.

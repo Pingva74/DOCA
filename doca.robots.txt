@@ -1,0 +1,40 @@
+Очень кратко о robots.txt
+
+полностью открытый сайт:
+
+User-agent: *
+Disallow:
+
+полностью закрытый сайт:
+
+User-agent: *
+Disallow: /
+
+закрыто от индексации несколько каталогов:
+
+User-agent: *
+Disallow: /cgi-bin/
+Disallow: /tmp/
+Disallow: /private/
+
+закрыт для конкретного робота:
+
+User-agent: BadBot
+Disallow: /
+
+открыт для конкретного робота:
+
+User-agent: Yandex
+Disallow:
+
+Запрет на индексацию файлов определенного типа
+
+User-agent: *
+Disallow: /*.pdf$
+
+Разрешить определенному поисковому роботу посещать определенную страницу
+
+User-agent: *
+Disallow: /no-bots/block-all-bots-except-rogerbot-page.html
+User-agent: Yandex
+Allow: /no-bots/block-all-bots-except-Yandex-page.html

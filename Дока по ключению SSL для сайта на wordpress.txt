@@ -1,0 +1,20 @@
+SSL
+
+Обычно помогает прописать в wp-config.php
+
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+    $_SERVER['HTTPS'] = 'on';
+
+
+Соответсвенно в nginx
+
+proxy_set_header X-Forwarded-Proto $scheme;
+
+Еще помогает добавить в wp-config.php
+
+define('FORCE_SSL_ADMIN', true);
+$_SERVER['HTTPS'] = 'on';
+
+и изменить в бд ссылки с http на https
+
+
