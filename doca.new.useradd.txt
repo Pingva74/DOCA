@@ -1,13 +1,13 @@
-Для заведения нового пользователя в dew.p-w-d.ru / stage.obispace.ru 
+Для заведения нового пользователя в dew.w-d.ru / stage.obispace.ru 
 
 1 подключаемся :
-для stage.obispace.ru sudo ssh -p 60022 root@stage.obispace.ru (тут порт 60022)
-для dev.p-w-d.ru sudo ssh root@dev.p-w-d.ru
+для stage.obispace.ru sudo ssh -p 50022 root@stage.obispace.ru (тут порт 50022)
+для dev.w-d.ru sudo ssh root@dev.w-d.ru
 2 создаем пользователя :
 
 для stage.obispace.ru: useradd -p PASSWORD -s /bin/bash USER
 
-для dew.p-w-d.ru все делаем через Весту: bash /usr/local/vesta/bin/v-add-user USER PASSWORD info@dev.p-w-d.ru default USER USER
+для dew.w-d.ru все делаем через Весту: bash /usr/local/vesta/bin/v-add-user USER PASSWORD info@dev.w-d.ru default USER USER
 
 * имя пользователя Иван Петров, создаем ipetrov (1 буква имени и фамилия)
 3 добавляем ключи
@@ -16,7 +16,7 @@
 setfacl -R -m u:USER:7 /var/www/obispace.ru/htdocs
 setfacl -d -R -m u:USER:7 /var/www/obispace.ru/htdocs
 
-Заходим на gitlab.p-w-d.ru
+Заходим на gitlab.w-d.ru
 1 заходим Admin area -> New user и тут заполняем 3 поля:
 Name ipetrov тот же пользователь что и на stage.obispace.ru кирилица не допустима.
 Username ipetrov тот же пользователь что и на stage.obispace.ru кирилица не допустима.
