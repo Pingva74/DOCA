@@ -2,8 +2,8 @@
 
 Добавить сервер в:
 
-    tp.suppix.org - доступ на сервер и остальные аккаунты по клиенту
-    zabbix.suppix.org - мониторинг:
+    tp.ppix.org - доступ на сервер и остальные аккаунты по клиенту
+    zabbix.ppix.org - мониторинг:
         Проверяем raid если есть (документация по RAID)
         Smartmontools (smartd) проверяем диски на такие параметры
             для SATA - Reallocated_Sector_Ct, Offline_Uncorrectable, Current_Pending_Sector (если есть)
@@ -17,11 +17,11 @@
         Если на сервере есть сайты, то пару сайтов поставить на мониторинг и добавить триггер
 
     настроить бэкап (rsnapshot) сервера на сервер бэкапов
-    установить почтовый клиент (postfix), проверить отправку тестового письма (echo "email message" | mail -s Test Мой_ящик@suppix.org)
-    установить logcheck, добавить файлик suppix c сервера backup.suppix.org
+    установить почтовый клиент (postfix), проверить отправку тестового письма (echo "email message" | mail -s Test Мой_ящик@ppix.org)
+    установить logcheck, добавить файлик ppix c сервера backup.ppix.org
     выставить время правильно и time zone
     redmine wiki - записать сервер в список серверов для клиента, выписать важную информацию про сервер и клиента
-    backup.suppix.org:/etc/hosts - добавить ip и имя
+    backup.ppix.org:/etc/hosts - добавить ip и имя
     добавить наш ключ в root или в другого юзера под которым будет заходить на сервер
 
     php
@@ -59,7 +59,7 @@ vim /etc/logcheck/logcheck.conf
 REPORTLEVEL="server"
 
 Установим куда слать отчеты
-SENDMAILTO=server@suppix.org
+SENDMAILTO=server@ppix.org
 
 Укажем логфайлы которые необходимо парсить в файле logcheck.logfiles
 
