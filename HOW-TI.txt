@@ -1,0 +1,547 @@
+Проверка работы userparametr zabbix агента 
+
+zabbix_agentd -ts hce.check.m[h2.dc6.hce-project.com:5630%DataProcessorData%drceDataStorageProperties%sizeInputBufferAsyncTasks.avg]
+=====================================================================
+список файлов отсортированый от даты изменения
+
+find /var/log -type f -printf '%TY-%Tm-%Td %TT %p\n' | sort -r
+=====================================================================
+Сортировка папок по размеру 
+
+du -h --max-depth=1 /tmp/ | sort -n -r | more
+=====================================================================
+Список файлов которые изменялись последние 10 минут
+
+find ./ -mmin "-10"
+=====================================================================
+Создание дампа БД
+
+mysqldump --opt journalshop_db > /root/journalshop_db.sql
+=====================================================================
+Восстановление БД из архива
+
+mysql -u root -p -f journalshop_db < ~/journalshop_db.sql
+=====================================================================
+Синхронизация файлов и папок
+
+rsync -avz /home/journalshop/ root@195.201.1.1:/home/journalshop/
+=====================================================================
+Передача файла по CSP
+
+scp journalshop_db.sql root@195.201.1.1:/root/
+=====================================================================
+Входим в mysql удаленно
+
+mysql -h 195.201.1.1 -u turistflow_u -p
+=====================================================================
+Поиск модулей Ubuntu
+
+apt-cache search php- | less
+======================================================================
+Тест Apache2
+
+apache2ctl configtest
+======================================================================
+Версия Линукс
+
+cat /etc/*-release
+======================================================================
+Изменения прав всем каталогам:
+
+find ./ -type d -exec chmod 755 {} \;
+======================================================================
+Изменение прав к файлам:
+
+find ./ -type f -exec chmod 655 {} \;
+======================================================================
+посмотреть параметры созданой DB
+
+show create database digital_db; 
+======================================================================
+Создать db с нужной кодировкой
+
+`create database digital_db DEFAULT CHARACTER SET utf8;`
+======================================================================
+процессы запущенные от пользователя
+
+top -u user_name
+======================================================================
+Сертификаты для NGINX
+
+добавить в файл реп!! - deb http://ftp.debian.org/debian/ jessie-backports main contrib non-free
+
+apt-get update
+apt-get install certbot -t jessie-backports
+получить сертификат:
+certbot certonly --webroot -w (docroot) -d foodddy.ru  -d www.foodddy.ru
+При ошибке 403 - прописываем в конфиг NGINX:
+
+location ^~ /.well-known/acme-challenge/ {
+allow all;
+default_type "text/plain";
+}
+
+location ~ ^/.well-known {
+    root /var/www;
+}
+
+автообновление
+01 11 * * *    /usr/bin/certbot renew --quiet --post-hook “killall -1 nginx”
+01 21 * * *	/opt/eff.org/certbot/venv/bin/certbot renew --quiet --post-hook “killall -1 nginx”
+
+сертификаты добавить в конфиг:
+
+ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+ssl_trusted_certificate /etc/letsencrypt/live/example.com/chain.pem;
+
+cosmetics-profy.ru
+
+Редирект на https в nginx
+
+if ($scheme = http) {
+return 301 https://$server_name$request_uri;
+}
+============================================================================
+Узнать размер каталога
+
+du -h -s /srv
+=============================================================================
+Поиск пакета к которому принадлежит файл
+
+yum provides /usr/lib64/php/modules/mysql.so
+=============================================================================
+Сервисы запущенные на компе (debian)
+
+service --status-all
+=============================================================================
+Быстро залить дирректорию с множеством файлов на удаленный хост
+
+tar -cvz dir | ssh <ip-адрес сервера> 'cat > test.tar.gz'
+
+и обратно:
+
+ssh root@$server “tar -zc ” | cat > backup.tar.gz
+=============================================================================
+Генерация сертификата Lets Encropt
+
+certbot certonly --webroot -w /var/www/www-root/data/www/vivero.ru/ -d vivero.ru -m support@suppix.org
+================================================================================
+Узнать какие сервисы запущены
+
+systemctl --all | grep elastic
+================================================================================
+количество процессов
+
+systemctl --all | grep -c elas
+================================================================================
+Закрываем доступ к сайту:
+Добавляем в .htaccess:
+
+AuthType Basic   
+AuthName admin 
+require valid-user 
+
+генерим .htpasswd
+htpasswd -cm .htpasswd admin
+.htpasswd = полный путь и имя файла. имя может быть любым.
+================================================================================
+проверка сертификата
+
+echo | openssl s_client -showcerts -servername http://plastilin.in.ua -connect plastilin.in.ua:443 2>/dev/null | openssl x509 -inform pem -noout -text | grep "Not After :" |awk '{print $4 echo " " $7}'
+================================================================================
+изменить дату на месяц назад
+
+date -d last-month
+================================================================================
+Макросы zabbix
+
+https://www.zabbix.com/documentation/3.4/ru/manual/appendix/macros/supported_by_location
+================================================================================
+Перезапуск nginx
+
+nginx -s reload или systemctl reload nginx.service
+================================================================================
+Монтируем дирректоррию в дирректоррию
+
+mount /home/volosy/web/haircenters.w-d.ru/public_html/ /home/volosy/web/volosy.w-d.ru/local/sites/ auto defaults   0 0
+================================================================================
+Скачать установочный скрипт битрикса
+
+wget https://www.1c-bitrix.ru/download/scripts/bitrixsetup.php
+================================================================================
+Смена пользователя
+
+sudo -u zabbix -H /bin/bash
+================================================================================
+Запуск Айболита
+
+php ai-bolit.php --path=/home/s/site1/public_html/
+================================================================================
+Синхронизация с помощью rsync
+
+rsync -az /home/omgisperfect/omgisperfect.com/www/ --delete --exclude='./bitrix/backup' --exclude='./bitrix/cache' fastuser@159.253.20.46:/var/www/fastuser/data/www/omgisperfect.com/
+==================================================================================
+список IP адресов подключенных к 80-му порту
+
+netstat -plan|grep :80|awk {'print $5'}|cut -d: -f 1|sort|uniq -c|sort -nk 1
+==================================================================================
+Apache2:
+
+apachectl restarts - перезапускает апач
+apachectl -t проверка синтаксиса
+apachectl -k graceful перезапуск апача без сброса активных соединеий
+apachectl configtest - проверка синтаксиса.
+==================================================================================
+перенаправление на https через конфиг apache
+
+RewriteEngine On
+RewriteCond %{SERVER_PORT} !443
+RewriteRule (.*) https://test.cmps.news/ [R]
+==================================================================================
+Авторизация через конфиг apache
+
+Require all denied
+AuthType Basic
+AuthUserFile /var/www/.htpasswd
+AuthName "Private Area"
+require valid-user
+
+htpasswd -cm .htpasswd admin
+.htpasswd = полный путь и имя файла. имя может быть любым.
+==================================================================================
+Проброс портов IPtables
+
+iptables -t nat -A PREROUTING -p tcp --dport 8080 -d 195.201.152.60 -j DNAT --to-destination 195.201.152.60:80
+
+-A PREROUTING -d 195.201.1.1/32  -p tcp -m tcp --dport 8080 -j DNAT --to-destination
+ 195.201.1.2:80
+==================================================================================
+setfacl -R -m u:ukalkin:7 /var/www/obispace.ru/htdocs
+setfacl -d -R -m u:ukalkin:7 /var/www/obispace.ru/htdocs
+useradd -p PmGkXX$5XVKul5 -s /bin/bash ukalkin
+===================================================================================
+трассировка определенного порта.
+
+traceroute -n -T -p 587 gmail-smtp-in.l.google.com
+===================================================================================
+Проверка оптимизация сайта:
+
+developers.google.com
+===================================================================================
+ubuntu смена таймзоны
+
+dpkg-reconfigure tzdata
+===================================================================================
+Загрузить последнюю версию smartctl db
+
+wget https://www.smartmontools.org/export/HEAD/branches/RELEASE_6_4_DRIVEDB/smartmontools/drivedb.h
+===================================================================================
+Добавляем юзеру права на нестандартную дирректоррию
+
+setfacl -R -m u:sodexo_ftp:7 /var/www/obispace.ru/htdocs/upload/pwd_cafeteria
+setfacl -d -R -m u:sodexo_ftp:7 /var/www/obispace.ru/htdocs/upload/pwd_cafeteria
+
+mkdir /home/dchernousov/videomost.p-w-d.ru/
+mount -o bind /usr/share/videomost/service/skin/ /home/dchernousov/videomost.p-w-d.ru/
+echo "/usr/share/videomost/service/skin /home/dchernousov/videomost.p-w-d.ru none bind 0 0" >> /etc/fstab
+==================================================================================
+Изменение кодировки по умолчанию на сайте через htaccess
+
+Добавляем вне блоков такие строки:
+
+AddDefaultCharset UTF-8
+php_value default_charset "UTF-8"
+==================================================================================
+Проверить скорость загрузки сайта:
+
+$ curl -s -w 'Testing Website Response Time for :%{url_effective}\n\nLookup Time:\t\t%{time_namelookup}\nConnect Time:\t\t%{time_connect}\nPre-transfer Time:\t%{time_pretransfer}\nStart-transfer Time:\t%{time_starttransfer}\n\nTotal Time:\t\t%{time_total}\n' -o /dev/null 190.2.148.38
+
+или так:
+curl -s -w 'Testing Website Response Time for :%{url_effective}\n\nLookup Time:\t\t%{time_namelookup}\nConnect Time:\t\t%{time_connect}\nAppCon Time:\t\t%{time_appconnect}\nRedirect Time:\t\t%{time_redirect}\nPre-transfer Time:\t%{time_pretransfer}\nStart-transfer Time:\t%{time_starttransfer}\n\nTotal Time:\t\t%{time_total}\n' -o /dev/null https://www.google.com
+===================================================================================
+Узнать свой IP :
+
+dig +short myip.opendns.com @resolver1.opendns.com
+host myip.opendns.com resolver1.opendns.com | grep "myip.opendns.com has" | awk '{print $4}'
+===================================================================================
+Создать не удаляемый файл
+
+chattr +i /backups/passwd (chattr -i /backups/passwd - вернуть изменения взад)
+===================================================================================
+Создать Битрикс окружение
+
+wget http://repos.1c-bitrix.ru/yum/bitrix-env.sh
+===================================================================================
+Проверка архива .tar.gz
+
+ tar -tvzf /home/alex/work/interbroshura.ru_20180923_105810_full_b98079e2.tar.gz >/dev/null && echo "Backup is good!"
+==================================================================================
+конвертация движка БД
+
+sed 's/ENGINE=InnoDB/ENGINE=MyISAM/g' dump.sql > resultdump.sql
+sed 's/ENGINE=MyISAM/ENGINE=InnoDB/g' dump.sql > resultdump.sql
+==================================================================================
+Узнать кодировку базы mysql
+
+USE имяВашейБазы;
+SELECT @@character_set_database, @@collation_database;
+==================================================================================
+Запускаем zabbix-agent от рута
+
+vi /etc/sudoers
+добавляем:
+zabbix ALL=(ALL) NOPASSWD: ALL
+===================================================================================
+php.ini разные настройки для разных сайтов
+
+[HOST=dev.site.com]
+error_reporting = E_ALL
+display_errors = On
+===================================================================================
+зачистить лог
+
+cat /dev/null > /var/log/aerospike/aerospike.log
+===================================================================================
+очередь постфикс
+
+postqueue -p
+===================================================================================
+извлечь таблицу из дампа
+
+sed -ne '/DROP TABLE IF EXISTS `api_landing_page_product`/,/UNLOCK TABLES/p' crm.sql  > /home/web/www/crm_24.09.2013.sql
+===================================================================================
+посмотреть очередь в rabbitmq
+
+rabbitmqctl list_queues name messages
+====================================================================================
+ добавление поьзователя в rabbitmq
+
+730  rabbitmqctl add_user gus CyIjfSRPRCS5qF
+732  rabbitmqctl set_user_tags gus administrator
+733  set_permissions -p / gus ".*" ".*" ".*" 
+734  rabbitmqctl set_user_tags gus administrator set_permissions -p / gus ".*" ".*" ".*"
+====================================================================================
+Увеличить количество открытых файлов mysql
+
+# mkdir -p /lib/systemd/system/mysql.service.d/
+# vi /lib/systemd/system/mysql.service.d/limit_nofile.conf
+
+[Service]
+LimitNOFILE=4096
+
+Reload system daemon and restart MySQL service:
+
+# systemctl daemon-reload
+# systemctl restart mysql
+====================================================================================
+Прокрутка экрана screen
+
+Ctrl+A Esc PgUp PgUp PgUp ... Esc
+====================================================================================
+Мони торинг запросов mysql
+
+mysqladmin proc
+====================================================================================
+GIT
+
+Create a new repository
+
+git clone git@gitlab.p-w-d.ru:website/test.git
+cd test
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin master
+
+Existing folder
+
+cd existing_folder
+git init
+git remote add origin git@gitlab.p-w-d.ru:website/test.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
+
+Existing Git repository
+
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin git@gitlab.p-w-d.ru:website/test.git
+git push -u origin --all
+git push -u origin --tags
+==========================================================================================
+Перестать отслежиать файл в Git
+
+git rm -r --cached /path/file
+
+git add .
+
+git commit -m "fixing .gitignore"
+
+=========================================================================================
+Просмотр запросов mysql
+
+mysqladmin proc
+========================================================================================
+Долгие запросы в mysql:
+
+show processlist;
+
+Убить долгий запрос:
+
+kill query ID;
+=========================================================================================
+узнать свой ip
+
+hostname -I
+=========================================================================================
+работа с гугл диском:
+
+rclone sync <имя_подключения>:<имя_контейнера> <путь_до_каталога> скачать
+rclone sync documents swift:new-bucket загрузить
+=========================================================================================
+Просмотр виртуальных хостов httpd/apache2
+
+apachectl/apache2ctl -S
+==========================================================================================
+Заливка дампа БД mysql без зарание созданной БД
+
+zcat tw_observation_project.2018-11-12.sql.gz | mysql
+==========================================================================================
+размонтировать
+
+umount /home/esemashko/sanalians.ru
+=========================================================================================
+удалить файл из GIT
+
+git rm -r --cached /путь/к/файлу
+=========================================================================================
+увеличить время работы скрипта на сайте
+NGINX + APACHE
+
+proxy_read_timeout      5m;
+proxy_send_timeout      5m;
+php.ini
+
+max_execution_time
+
+==========================================================================================
+Safe_mode на сервере с apache
+
+php_admin_flag safe_mode on
+php_admin_flag safe_mode off
+в конфиге apache
+==========================================================================================
+Очистка swap
+
+swapoff -a && swapon -a && dmesg -T && free -h
+==========================================================================================
+Генератор паролей в bash
+
+tr -dc A-Za-z0-9 < /dev/urandom | head -c 8 | xargs
+==========================================================================================
+Тестовая отправка почты
+
+echo "Using daily traffic" | mail -s "Daily traffic report" alex@ppix.org
+==========================================================================================
+Генерация ключа postfix -> gmail
+
+openssl req -new -outform PEM -out smtpd.cert -newkey rsa:2048 -nodes -keyout smtpd.key -keyform PEM -days 365 -x509
+===========================================================================================
+размер каталогов в текущем каталоге
+
+du -sh *
+===========================================================================================
+Удаление определенной категории писем из очредиpostfix
+
+mailq | grep -v "Queue ID" | while read line; do if [ "1" != `echo $line | wc -m` ]; then echo -n " "$line; else echo""; fi ; done | grep "Host not found" | awk '{ print $1 }' | postsuper -d -
+============================================================================================
+скопировать файлы старше полугода на другой сервер
+
+find /srv/www/pushw/hosts-root7/images/pushes/usr.58db988a0ac8c -mtime +180 -type f -exec scp -P 44022 {} root@95.216.0.244:/backup/host-8/ \;
+============================================================================================
+файл 1616.php
+
+<?php
+ phpinfo();
+ ?>
+============================================================================================
+vi показать номера строк
+
+:set nu
+============================================================================================
+быстро переименовываем файл
+
+mv nginx.{conf,confold}
+============================================================================================
+Копирование большого количества файлов через TAR c распаковкой
+
+tar cf - . | ssh smith@remote.server tar xfp - -C /usr/backup/smith
+============================================================================================
+Безправный пользователь в нужную папку
+
+useradd --shell /usr/sbin/nologin --home-dir /var/www/moscowgame.ru moscowgame
+============================================================================================
+запись образа на диск
+
+cdrecord -dev=/dev/cdrom -speed=16 -eject -v cdrom.iso
+
+=============================================================================================
+Отправка письма PHP скриптом
+
+if (mail("andrey@suppix.org","test subject", "test body","From: info@kungfu-school.ru")) 
+echo "Сообщение передано функции mail, проверьте почту в ящике."; 
+else 
+echo "Функция mail не работает, свяжитесь с администрацией хостинга."; 
+==============================================================================================
+Создать анимированный gif из картинок
+
+convert -delay 20 -loop 0 *.jpg myimage.gif
+================================================================================================
+там контейнеры но openvz
+vzlist -a
+vzctl enter id
+чтобы попасть в контейнер (edited) 
+====================================================================================================
+Определить кодировку БД
+
+USE имяВашейБазы;
+SELECT @@character_set_database, @@collation_database;
+===========================================================================================================-
+Сжатие картинок на вебсервере
+
+https://github.com/imgo/imgo
+==============================================================================================================
+Измерение скорости CURL-ом
+
+curl -s -w 'Testing Website Response Time for :%{url_effective}\n\nLookup Time:\t\t%{time_namelookup}\nConnect Time:\t\t%{time_connect}\nAppCon Time:\t\t%{time_appconnect}\nRedirect Time:\t\t%{time_redirect}\nPre-transfer Time:\t%{time_pretransfer}\nStart-transfer Time:\t%{time_starttransfer}\n\nTotal Time:\t\t%{time_total}\n' -o /dev/null https://iaskrava.org
+
+ответ:
+
+Lookup Time:		0,004160  время в секундах, которое прошло с начала до завершения определения ip-адреса по имени
+Connect Time:		0,048642  время в секундах, которое прошло с начала до завершения соединения TCP с удаленным хостом 
+AppCon Time:		0,272142  время в секундах, которое прошло с начала до завершения SSL-соединения/рукопожатия с удаленным хостом.
+Redirect Time:		0,000000  время в секундах, которое потребовалось для всех шагов перенаправления
+Pre-transfer Time:	0,272180  время в секундах, которое прошло с начала до начала передачи файла
+Start-transfer Time:	0,317395  время в секундах, прошедшее с начала до момента, когда первый байт должен был быть передан
+
+Total Time:		0,317438  общее время в секундах, в течение которого выполнялась полная операция
+
+==========================================================================================================================
+нагрузка на сетевой интерфейс
+
+iftop
+==========================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
