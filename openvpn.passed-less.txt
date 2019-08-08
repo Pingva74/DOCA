@@ -9,3 +9,21 @@ password
 @reboot		/Путь/openvpn --config /путь/мой_конфиг.ovpn
 Перезапускаем систему.
 Проверяем наличие тунеля командой ifconfig
+
+
+
+If the GUI is buggy, that would connect to the openvpn server bypassing the graphical interface, you need to make a minimum of settings.
+
+1. In the folder with the *.ovpn configuration files, create the key.txt file (the folder and file name can be any anoter, of your choice)
+2. In the configuration file, add the line: "auth-user-pass /pass/key.txt"
+3. In the key.txt file, add it to the column:
+login
+password
+(your LDAP authorization credentials)
+4. in crontab (root) we write the command:
+@reboot /path/openvpn --config /path/my_config.ovpn
+
+(openvpn command can be in different places, define the full path like this: "which openvpn")
+
+Restart the system "sudo shutdown -r +0"
+Check for the presence of the tunnel "ifconfig" command
