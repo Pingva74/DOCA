@@ -1,0 +1,31 @@
+Дока про просмотру логов в kubernets
+
+Для того что бы посмотреть логи дохлой Поды кубернетеса нужно:
+
+1. Получить список всех дохлых подов в нужном контексте:
+
+kubectl config get-contexts - получем список всех контекстов в кубернетисе, если мы не знаем контекста.
+
+kubectl --context=CONTEXT get pods --all-namespaces -o wide | grep -v " Running "| grep -v " Completed "
+
+2. Получить логи выбранной дохлой поды
+
+kubectl logs POD_NAME -n NAME_SPASE
+
+Если мы хотим увидеть 20 последних строк лога нужно добавить (--tail=20)
+==========================================================================================================
+Docka about viewing logs in kubernets
+
+In order to see the logs of the dead kubernetes Pod you need:
+
+1. Get a list of all dead pods in the right context:
+
+kubectl config get-contexts - get a list of all contexts in kubernetis if we don’t know the context.
+
+kubectl --context = CONTEXT get pods --all-namespaces -o wide | grep -v "Running" | grep -v "Completed"
+
+2. Get the logs of the selected dead pod
+
+kubectl logs POD_NAME -n NAME_SPASE
+
+If we want to see the last 20 lines of the log we need to add (--tail=20)
