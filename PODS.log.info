@@ -14,7 +14,7 @@ kubectl logs POD_NAME -n NAME_SPASE
 
 Если мы хотим увидеть 20 последних строк лога нужно добавить (--tail=20)
 ==========================================================================================================
-Docka about viewing logs in kubernets
+Docka is about viewing logs in kubernets
 
 In order to see the logs of the dead kubernetes Pod you need:
 
