@@ -1,6 +1,6 @@
 Дока по добавлению сайта в GitLab
 
-Открываем ссылку http://gitlab.p-w-d.ru L(Login root\ passwd YfsmKGcL1fqrgoKWjrjj)
+Открываем ссылку http://gitlab.p-w-d.ru L(Login root\ passwd YfsmKGc)
 
 Далее жмем [New project], меняем Administrator на website.
 
