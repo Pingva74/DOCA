@@ -38,3 +38,6 @@ kubectl --context=CONTEXT get pods --all-namespaces -o wide | grep -v " Running 
 
 kubectl logs machine-autoscaler -n kube-spase
 =======================================================================================================================
+Показать, кто ест память:
+
+kubectl --context=context.name describe nodes node.name
