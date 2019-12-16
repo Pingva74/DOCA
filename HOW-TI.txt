@@ -596,8 +596,13 @@ ps -eo pid,ppid,%mem,%cpu,comm --sort=-%cpu | head -10
 
 ffmpeg -f image2 -i output%4d.png video.mov
 ============================================================================================================================
+Centos (7) заблокировать обновление пакета:
 
-
+yum -y install yum-versionlock - установили пакет
+yum versionlock mariadb - заблокировали обновление необходимого пакета
+yum versionlock list - посмотрели список необновляемых пакетов
+yum versionlock delete mariadb - удалили марию из списка необновляемых хпакетов
+yum versionlock clear - очистили весь список необновляемых пакетов
 
 
 
