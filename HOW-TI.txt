@@ -603,6 +603,8 @@ yum versionlock mariadb - заблокировали обновление нео
 yum versionlock list - посмотрели список необновляемых пакетов
 yum versionlock delete mariadb - удалили марию из списка необновляемых хпакетов
 yum versionlock clear - очистили весь список необновляемых пакетов
-
-
+===========================================================================================================================
+smartctl дисков за контроллером PERC H310
+sudo smartctl -a /dev/sda -d sat+megaraid,00
+sudo smartctl -a /dev/sda -d sat+megaraid,01
 
