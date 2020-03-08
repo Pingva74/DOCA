@@ -625,3 +625,13 @@ sudo dd if=CentOS-Userland-7-armv7hl-RaspberryPI-Minimal-1908-sda.raw of=/dev/mm
 httperf --hog --server 192.168.122.10 --wsess=100000,5,2 --rate 1000 --timeout 5
 httperf --port 80 --server <domain> --uri=/ --num-conns=100 --rate=10
 ============================================================================================================================
+добавляем EPEL в centos 7 на малине
+
+cat > /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Epel rebuild for armhfp
+baseurl=https://armv7.dev.centos.org/repodir/epel-pass-1/
+enabled=1
+gpgcheck=0
+
+EOF
