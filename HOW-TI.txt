@@ -1,6 +1,6 @@
 Проверка работы userparametr zabbix агента 
 
-zabbix_agentd -ts hce.check.m[h2.dc6.hce-project.com:5630%DataProcessorData%drceDataStorageProperties%sizeInputBufferAsyncTasks.avg]
+zabbix_agentd -ts metricka
 =====================================================================
 список файлов отсортированый от даты изменения
 
