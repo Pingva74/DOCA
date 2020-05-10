@@ -644,3 +644,8 @@ chcon -R -t mysqld_db_t /data
 
 nmcli radio wifi off
 ============================================================================================================================
+centos на rpi4
+
+root@mx:/home/alex/Загрузки# xzcat CentOS-Userland-7-armv7hl-RaspberryPI-Minimal-4-2003-sda.raw.xz | dd of=/dev/mmcblk0 status=progress bs=4M
+root@mx:/home/alex/Загрузки# sync
+
