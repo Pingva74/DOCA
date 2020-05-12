@@ -1,0 +1,54 @@
+Создаем точки монтирования systemd, минуя /etc/fstab
+
+1. Создаем файл:
+
+sudo vi /etc/systemd/system/var-log.mount
+
+с примерно следующим содержимым:
+
+[Unit]
+Description=Mount System var-log Directory
+
+[Mount]
+What=/dev/sda1 
+Where=/var/log
+Type=ext4
+Options=defaults,noexec
+
+[Install]
+WantedBy=multi-user.target
+
+где:
+
+[Unit]
+Description=описание точки монтирования
+
+[Mount]
+What=Какой диск
+Where=куда монтируем
+Type=файловая система
+Options=опции монтирования
+
+[Install]
+WantedBy=multi-user.target - без изменений
+
+сохраняем и выходим. Далее запускаем:
+
+ sudo systemctl start var-log.mount
+ 
+ проверяем, все ли правильно смонтировалось:
+ 
+ lsblk
+ 
+ если есть сообщения об ошибках дебажим их таким образом:
+ 
+ sudo systemctl status var-log.mount
+ 
+ добавляем в автозагрузку:
+ 
+ sudo systemctl enable var-log.mount
+ 
+ На этом все.
+ 
+ ВАЖНО!! имена файлов должны содержать полный путь к точке монтирования, но / следует заменить на -
+ иначе работать не будет.
