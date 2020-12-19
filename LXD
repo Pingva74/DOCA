@@ -1,0 +1,323 @@
+Установка LXD и утилиты командной строки
+Ubuntu desktop and Ubuntu server
+Пользователи Ubuntu 16.04 LTS могут установить LXD с помощью:
+
+apt-get install lxd
+Пользователи Ubuntu 14.04 LTS также могут установить LXD с использованием backports:
+
+apt-get -t trusty-backports install lxd
+В качестве альтернативы, для получения последнего upstream релиза доступен PPA:
+
+add-apt-repository ppa:ubuntu-lxc/lxd-stable
+apt-get update
+apt-get dist-upgrade
+apt-get install lxd
+Пакет создает новую группу "lxd" содержащую всех пользователей, которым разрешено соединятся с lxd через локальный unix socket. Все пользователи групп "admin" и "sudoers" добавляются автоматически. Если ваш пользователь не входит в одну из этих групп, вам необходимо вручную добавить его в группу "lxd".
+
+Так как членство в группах фиксируется при входе, вам необходимо закрыть и переоткрыть вашу пользовательскую сессию или использовать команду "newgrp lxd" в интерактивной оболочке, в которой вы работаете с lxd.
+
+newgrp lxd
+Затем, для начальной настройки демона LXD, включающей, по вашему пожеланию, настройку оптимизированного хранилища (ZFS), а также для обеспечения видимости демона в сети и настройки сети для контейнеров:
+
+sudo lxd init
+Ubuntu Core (snappy)
+LXD доступен для Ubuntu Core как пакет Snap в магазине. Вы можете установить его с помощью:
+
+sudo snappy install lxd.stgraber
+После этого, с LXD можно будет взаимодействовать с помощью команды "lxc".
+
+Следует отметить, что генерация сертификата сервера может занять долгое время, если вы работаете с устройством вроде rpi2, так что может быть, что LXD начнет отвечать на команду lxc только через несколько минут.
+
+Другие дистрибутивы
+На данный момент существуют пакеты для множества дистрибутивов, включая Gentoo и, конечно, Ubuntu. Пользователи других дистрибутивов тоже могут найти их в своем менеджере пакетов.
+
+Если их там нет, пожалуйста, загрузите и соберите LXD из git или используя последний релизный tarball.
+
+Инструкции для обоих способов доступны здесь.
+
+Импорт различных образов
+LXD основан на образах. Контейнеры создаются из образа, поэтому хранилище образов должно содержать несколько образов перед основной работой с LXD.
+
+Есть несколько путей заполнить хранилище:
+
+Используя удаленный LXD как сервер образов
+Используя встроенные источники образов
+Вручную импортируя по одному
+lxc image import <file> --alias <name>
+Использование удаленного LXD как сервера образов
+Использование удаленного сервера образов также просто, как его добавление и использование:
+
+lxc remote add images 1.2.3.4
+lxc launch images:image-name your-container
+Список образов может быть получен с:
+
+lxc image list images:
+Использование встроенных источников образов
+По умолчанию LXD поставляется с 3 удаленными источниками, предоставляющими образы:
+
+ubuntu: (for stable Ubuntu images)
+ubuntu-daily: (for daily Ubuntu images)
+images: (for a bunch of other distros)
+Для запуска контейнера из них, просто:
+
+lxc launch ubuntu:14.04 my-ubuntu
+lxc launch ubuntu-daily:16.04 my-ubuntu-dev
+lxc launch images:centos/6/amd64 my-centos
+Ручной импорт образа
+Если у вас уже есть lxd-совместимый файл образа, вы можете импортировать его:
+
+lxc image import \<file\> --alias my-alias
+И запустить контейнер:
+
+lxc launch my-alias my-container
+Смотрите спецификации образов для подробной информации.
+
+Создание и использование вашего первого контейнера
+Предполагая, что вы импортировали образ Ubuntu cloud из источника "ubuntu", можете создать контейнер:
+
+lxc launch ubuntu first
+Это создаст и запустит новый контейнер ubuntu, что подтвердит:
+
+lxc list
+Ваш контейнер здесь называется "first". Вы можете предоставить LXD выбрать случайное имя просто вызвав "lxc launch ubuntu" без имени.
+
+Сейчас ваш контейнер запущен, вы можете получить интерактивный доступ внутрь:
+
+lxc exec first -- /bin/bash
+Или вызвать команду напрямую:
+
+lxc exec first -- apt-get update
+Для скачивания файла из контейнера, используйте:
+
+lxc file pull first/etc/hosts .
+Для загрузки:
+
+lxc file push hosts first/tmp/
+Для остановки, просто сделайте:
+
+lxc stop first
+И для полного удаления:
+
+lxc delete first
+Множество хостов
+Утилита командной строки "lxc" может связываться со множеством серверов LXD. По умолчанию она связана с локальным по локальному UNIX socket.
+
+Удаленные операции требуют запуска двух команд на удаленном сервере:
+
+lxc config set core.https_address "[::]"
+lxc config set core.trust_password some-password
+Первая указывает LXD слушать все адреса на порту 8443. Вторая устанавливает надежный пароль для связи с сервером.
+
+Теперь для связи с удаленным LXD, вы можете просто добавить его:
+
+lxc remote add host-a <ip address or DNS>
+Это попросит вас подтвердить отпечаток удаленного сервера а затем спросит пароль.
+
+И после этого, используйте те же команды, что и раньше, но предваряя из именами контейнера и образа:
+
+lxc exec host-a:first -- apt-get update
+
+===========================================================================================================================================
+
+How to make your LXD containers get IP addresses from your LAN using a bridge
+By Simos Xenitellis in Planet Ubuntu, ubuntu, Ubuntu-gr
+Background: LXD is a hypervisor that manages machine containers on Linux distributions. You install LXD on your Linux distribution and then you can launch machine containers into your distribution running all sort of (other) Linux distributions.
+
+In the previous post, we saw how to get our LXD container to receive an IP address from the local network (instead of getting the default private IP address), using macvlan.
+
+
+
+In this post, we are going to see how to use a bridge to make our containers get an IP address from  the local network. Specifically, we are going to see how to do this using NetworkManager. If you have several public IP addresses, you can use this method (or the other with the macvlan) in order to expose your LXD containers directly to the Internet.
+
+Creating the bridge with NetworkManager
+See this post How to Configure and Use Network Bridge in Ubuntu Linux (new link, thanks Samuel) on how to create the bridge with NetworkManager. It explains that you
+
+Use NetworkManager to Add a New Connection, a Bridge.
+When configuring the Bridge, you specify the real network connection (the device, like eth0 or enp3s12) that will be the slave of the bridge. You can verify the device of the network connection if you run ip route list 0.0.0.0/0.
+Then, you can remove the old network connection and just keep the slave. The slave device (bridge0) will now be the device that gets you your LAN IP address.
+At this point you would have again network connectivity. Here is the new device, bridge0.
+
+$ ifconfig bridge0
+bridge0 Link encap:Ethernet HWaddr 00:e0:4b:e0:a8:c2 
+ inet addr:192.168.1.64 Bcast:192.168.1.255 Mask:255.255.255.0
+ inet6 addr: fe80::d3ca:7a11:f34:fc76/64 Scope:Link
+ UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1
+ RX packets:9143 errors:0 dropped:0 overruns:0 frame:0
+ TX packets:7711 errors:0 dropped:0 overruns:0 carrier:0
+ collisions:0 txqueuelen:1000 
+ RX bytes:7982653 (7.9 MB) TX bytes:1056263 (1.0 MB)
+Creating a new profile in LXD for bridge networking
+In LXD, there is a default profile and then you can create additional profile that either are independent from the default (like in the macvlan post), or can be chained with the default profile. Now we see the latter.
+
+First, get a list of all available existing profiles. There is a single profile, the default one from LXD, and is used by 11 LXD containers. This means that this LXD installation has 11 containers.
+
+$ lxc profile list
++---------------+---------+
+| NAME          | USED BY |
++---------------+---------+
+| default       | 11      |
++---------------+---------+
+Then, create a new and empty LXD profile, called bridgeprofile.
+
+$ lxc profile create bridgeprofile
+Here is the fragment to add to the new profile. The eth0 is the interface name in the container, so for the Ubuntu containers it does not change. Then, bridge0 is the interface that was created by NetworkManager. If you created that bridge by some other way, add here the appropriate interface name. The EOF at the end is just a marker when we copy and past to the profile.
+
+description: Bridged networking LXD profile
+devices:
+  eth0:
+    name: eth0
+    nictype: bridged
+    parent: bridge0
+    type: nic
+EOF
+Paste the fragment to the new profile.
+
+$ cat <<EOF | lxc profile edit bridgeprofile
+(paste here the full fragment from earlier)
+The end result should look like the following.
+
+$ lxc profile show bridgeprofile
+config: {}
+description: Bridged networking LXD profile
+devices:
+  eth0:
+    name: eth0
+    nictype: bridged
+    parent: bridge0
+    type: nic
+name: bridgeprofile
+used_by:
+Now, list again the profiles so that we can verify the newly created profile, bridgeprofile. It is there, and it is not used yet by a LXD (lex-dee) container.
+
+$ lxc profile list
++---------------+---------+
+| NAME          | USED BY |
++---------------+---------+
+| bridgeprofile | 0       |
++---------------+---------+
+| default       | 11      |
++---------------+---------+
+If it got messed up, delete the profile and start over again. Here is the command.
+
+$ lxc profile delete profile_name_to_delete
+Creating containers with the bridge profile
+Now we are ready to create a new container that will use the bridge. We need to specify first the default profile, then the new profile. This is because the new profile will overwrite the network settings of the default profile.
+
+$ lxc launch -p default -p bridgeprofile ubuntu:x mybridge
+Creating mybridgeStarting mybridge
+Here is the result.
+
+$ lxc list
++-------------+---------+---------------------+------+
+| mytest | RUNNING | 192.168.1.72 (eth0)      |      |
++-------------+---------+---------------------+------+
+| ...                                         | ...  |
+The container mybridge is accessible from the local network.
+
+Changing existing containers to use the bridge profile
+Suppose we have an existing container that was created with the default profile, and got the LXD NAT network. Can we switch it to use the bridge profile?
+
+Here is the existing container.
+
+$ lxc launch ubuntu:x mycontainer
+Creating mycontainerStarting mycontainer
+Let’s assign mycontainer to use the new profile, “default,bridgeprofile”.
+
+$ lxc profile assign mycontainer default,bridgeprofile
+Now we just need to restart the networking in the container.
+
+$ lxc exec mycontainer -- systemctl restart networking.service
+This can take quite some time, 10 to 20 seconds. Be patient. Obviously, we could simply restart the container. However, since it can take quite some time to get the IP address, it is more practical to know exactly when you get the new IP address.
+
+Let’s see how it looks!
+
+$ lxc list ^mycontainer$
++----------------+-------------+---------------------+------+
+| NAME           | STATE       | IPV4                | IPV6 |
++----------------+-------------+---------------------+------+
+| mycontainer    | RUNNING     | 192.168.1.76 (eth0) |      |
++----------------+-------------+---------------------+------+
+It is great! It got a LAN IP address! In the lxc list command, we used the filter ^mycontainer$, which means to show only the container with the exact name mycontainer. By default, lxc list does a substring search when it tries to match a container name. Those ^ and $ characters are related to Linux/Unix in general, where ^ means start, and $ means end. Therefore, ^mycontainer$ means the exact string mycontainer!
+
+Changing bridged containers to use the LXD NAT
+Let’s switch back from using the bridge, to using the LXD NAT network. We stop the container, then assign just the default profile and finally start the container.
+
+$ lxc stop mycontainer
+$ lxc profile assign mycontainer default
+Profiles default applied to mycontainer
+$ lxc start mycontainer
+Let’s have a look at it,
+
+$ lxc list ^mycontainer$
++-------------+---------+----------------------+--------------------------------+
+| NAME        | STATE   | IPV4                 | IPV6                           |
++-------------+---------+----------------------+--------------------------------+
+| mycontainer | RUNNING | 10.52.252.101 (eth0) | fd42:cba6:...:fe10:3f14 (eth0) |
++-------------+---------+----------------------+--------------------------------+
+NOTE: I tried to assign the default profile while the container was running in bridged mode. It made a mess with the networking and the container could not get an IPv4 IP address anymore. It could get an IPv6 address though. Therefore, use as a rule of thumb to stop a container before assigning a different profile.
+
+NOTE #2: If your container has a LAN IP address, it is important to stop the container so that your router’s DHCP server gets the notification to remove the DHCP lease. Most routers remember the MAC address of a new computer, and a new container gets a new random MAC address. Therefore, do not delete or kill containers that have a LAN IP address but rather stop them first. Your router’s DHCP lease table is only that big
+
+=========================================================================================================================================
+Настройка Bridge в CentOS 7
+
+Как установить и начать работать с решением для обеспечения виртуализации в среде Linux мы разобрались. Все вроде бы хорошо и виртуалки работают, но с подключенной сетью по умолчанию они спрятаны от внешнего мира за NAT.
+
+Что бы дать полноценный доступ к виртуальным машинам – что бы они были видны в общей сети так же как и обычный компьютер нам надо настроить Bridge.
+
+Настройка Bridge в CentOS 7
+1. Необходимо внести изменения в настройки нашей сетевой карты которая смотрит в сеть:
+
+У меня название этой сетевой карты в системе enp6s0, и открываем конфиг:
+
+vi /etc/sysconfig/network-scripts/ifcfg-enp6s0
+И добавляем строчку BRIDGE=br0 (как показано ниже):
+
+BOOTPROTO=none
+NM_CONTROLLED=no
+TYPE=Ethernet
+DEVICE=enp6s0
+MTU=1500
+ONBOOT=yes
+*********
+BRIDGE=br0
+2. Далее нам необходимо создать файл ifcfg-br0:
+
+vi /etc/sysconfig/network-scripts/ifcfg-br0
+Если у IP-адрес наша ХОСТ машина получает по DHCP то конфиг будет выглядеть следующим образом:
+
+DEVICE=br0
+TYPE=Bridge
+BOOTPROTO=dhcp
+IPV6INIT=no
+IPV6_AUTOCONF=no
+ONBOOT=yes
+Или если вы используете статические настройки сети :
+
+GATEWAY=192.168.1.1
+IPV6INIT=no
+DNS2=8.8.4.4
+BROADCAST=192.168.1.255
+DNS1=8.8.8.8
+BOOTPROTO=none
+TYPE=Bridge
+DEVICE=br0
+MTU=1500
+NETMASK=255.255.255.0
+IPADDR=192.168.1.234
+DEFROUTE=yes
+NETWORK=192.168.1.0
+IPV4_FAILURE_FATAL=yes
+ONBOOT=yes
+Теперь можно перезапустить сеть:
+
+service network restart
+И теперь что бы создать виртуальную машину с подключением к интерфейсу br0 мы используем:
+
+--network bridge:br0
+==================================================================================================================================================
+https://number1.co.za/managing-lxc-lxd-linux-containers-with-terraform/
+
+
+
+
