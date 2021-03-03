@@ -657,3 +657,14 @@ for CPUFREQ in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do [ -f $C
 
 for CPUFREQ in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do [ -f $CPUFREQ ] || continue; echo -n performance > $CPUFREQ; done
 ============================================================================================================================
+xtrabackup
+
+sudo xtrabackup --user=root --password='password' --datadir=/var/lib/mysql --target-dir=/var/backups/xtrbkp/ --backup
+OR
+sudo innobackupex --user=root --password='password' --no-timestamp  --rsync /var/backups/ 2>&1
+
+
+
+
+
+
