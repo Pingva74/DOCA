@@ -662,6 +662,10 @@ xtrabackup
 sudo xtrabackup --user=root --password='password' --datadir=/var/lib/mysql --target-dir=/var/backups/xtrbkp/ --backup
 OR
 sudo innobackupex --user=root --password='password' --no-timestamp  --rsync /var/backups/ 2>&1
+===============================================================================================================================
+сопоставить винт и порт
+
+find -L /sys/bus/pci/devices/*/ata*/host*/target* -maxdepth 3 -name "sd*" 2>/dev/null | egrep block |egrep --colour '(ata[0-9]*)|(sd.*)'
 
 
 
