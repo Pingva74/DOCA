@@ -320,4 +320,164 @@ https://number1.co.za/managing-lxc-lxd-linux-containers-with-terraform/
 
 
 
+===================================================================================================================================================
+https://www.thomas-pk.com/notes/infrastructure/vm-installs/lxclxd-install.html
+
+LXC/LXD Setup on OracleLinux
+Reference URLs:
+https://www.itzgeek.com/how-tos/linux/centos-how-tos/setup-linux-container-with-lxc-on-centos-7-rhel-7.html
+
+https://computingforgeeks.com/run-linux-containers-with-lxc-lxd-on-centos/
+
+Disable SELinux Enforcing
+$ getenforce shows you the SELinux status.
+
+$ sudo setenforce 0 to disable Enforcing for the current session.
+
+$ sudo sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config to permanently disable Enforcing across reboots.
+
+Enable the EPEL repo
+Create the file /etc/yum.repos.d/epel-yum-ol7.repo which has the following contents:
+
+[ol7_epel]
+name=Oracle Linux $releasever EPEL ($basearch)
+baseurl=http://yum.oracle.com/repo/OracleLinux/OL7/developer_EPEL/$basearch/
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+gpgcheck=1
+enabled=1
+$ sudo yum update -y
+
+Install snapd
+$ sudo yum install -y snapd
+
+$ sudo systemctl enable --now snapd.socket to enable the systemd unit that manages the main snap communication socket.
+
+$ sudo ln -s /var/lib/snapd/snap /snap to enable classic snap support.
+
+logout and log back in as root.
+
+Add Kernel Parameters
+Some important kernel options that are required by LXD have to be enabled as follows.
+
+# grubby --args="user_namespace.enable=1" --update-kernel="$(grubby --default-kernel)"
+
+# grubby --args="namespace.unpriv_enable=1" --update-kernel="$(grubby --default-kernel)"
+
+# echo "user.max_user_namespaces=3883" | sudo tee -a /etc/sysctl.d/99-userns.conf
+
+now reboot the server and give snapd a little time to connect to its repositories.
+
+Install LXD
+$ sudo snap install --classic lxd would now install LXD.
+
+On the installation done on 27 Mar 2021, the LXD version installed was 4.12
+
+$ sudo usermod -aG lxd <your-username> to add your username to the lxd group
+
+$ newgrp lxd is used to change the current group ID during a login session.
+
+$ lxd init to start the LXD initialization process. Use an lvm for the storage backend with the other options as default.
+
+$ sudo firewall-cmd --add-interface=lxdbr0 --zone=trusted --permanent to add this bridge to the firewall’s trusted zone. This allows all incoming traffic via lxdbr0.
+
+$ sudo firewall-cmd --reload to reload the firewall rules.
+
+Creating Containers
+$ lxc launch images:centos/8/amd64 cent8 to create a centos container.
+
+$ lxc list to list running containers.
+
+$ lxc stop cent8 to stop the container.
+
+$ lxc delete cent8 to delete the container.
+
+$ lxc exec cent8 -- /bin/bash to start an interactive bash session in the container.
+
+Bridging LXD externally
+Reference URL: https://blog.simos.info/how-to-make-your-lxd-container-get-ip-addresses-from-your-lan/
+
+Creating a new LXD profile
+On a fresh LXD installation, only the default profile would be available
+
+$ lxc profile list
++------------+---------+
+| NAME       | USED BY |
++------------+---------+
+| default    | 0       |
++------------+---------+
+We now create a new profile called macvlan
+
+$ lxc profile create macvlan
+Profile macvlan created
+$ lxc profile list
++------------+---------+
+| NAME       | USED BY |
++------------+---------+
+| default    | 0       |
++------------+---------+
+| macvlan    | 0       |
++------------+---------+
+The settings for the new profile would be as shown below:
+
+$ lxc profile show macvlan
+config: {}
+description: ""
+devices: {}
+name: macvlan
+used_by: []
+$
+We need to add a new NIC with the nictype macvlan with its parent being the container host system’s NIC. To find out what that NIC is called, we do the following:
+
+$ ip route show default 0.0.0.0/0
+default via 192.168.1.1 dev enp1s0 proto static metric 100
+Setting the profile
+From the output above, we know the parent NIC’s name is enp1s0. We can now add the right properties for the eth0 NIC of the container.
+
+$ lxc profile device add macvlan eth0 nic nictype=macvlan parent=enp1s0
+Device eth0 added to macvlan
+
+$ lxc profile show macvlan
+config: {}
+description: ""
+devices:
+  eth0:
+    nictype: macvlan
+    parent: enp1s0
+    type: nic
+name: macvlan
+used_by:
+- /1.0/instances/net1
+And, that’s it! Now when use the following example below to use the new macvlan profile.
+
+Using the profile
+$ lxc launch images:debian/10 c1 --profile default --profile macvlan
+Creating c1
+Starting c1
+
+$ lxc list
++------+---------+----------------------+------+-----------+-----------+
+| NAME |  STATE  |         IPV4         | IPV6 |   TYPE    | SNAPSHOTS |
++------+---------+----------------------+------+-----------+-----------+
+| net1 | RUNNING | 192.168.1.220 (eth0) |      | CONTAINER | 0         |
++------+---------+----------------------+------+-----------+-----------+
+=========================================================================================
+https://stackoverflow.com/questions/31228191/how-do-i-export-a-lxc-container
+
+Turning a container into an image
+
+The easiest way by far to build an image with LXD is to just turn a container into an image.
+
+This can be done with:
+
+lxc launch ubuntu:14.04 my-container
+lxc exec my-container bash
+<do whatever change you want>
+lxc publish my-container --alias my-new-image
+You can even turn a past container snapshot into a new image:
+
+lxc snapshot my-container some-snapshot
+
+lxc publish my-container/some-snapshot --alias some-image
+
+
 
